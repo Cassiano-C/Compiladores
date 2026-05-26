@@ -14,8 +14,14 @@ Aqui esta um compilado que foi criado na materia de Compiladores 1 da UFMS.
 |**scaner.h**| Declaração da classe que vai ser usada na **scaner.cpp** |
 |**token.h**| Declaração da classe **token** para que o **scaner** a use |
 
+## Gramatica do compilador
+O doc abixo vai conter a linguagem é caso queira modificala modifique o doc, ele só pode ser acessar com a conta da UFMS.
+
+<a href="https://docs.google.com/document/d/1dhHmLc58T4pNHowBL2XEHwUvSWKWVjCdRKFNF6Dc1Tg/edit?usp=sharing">Documento do Gramatica</a>
+
 
 ## Logica do compilador
+
 
 ## Como compilar e executar
 Esse projeto tem uma forma diferente de executar.

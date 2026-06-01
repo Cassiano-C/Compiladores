@@ -6,35 +6,43 @@ using namespace std;
 
 enum Names 
 {
-    UNDEF,// 0
-    IDENTIFIER, // 1
-    INTCONST, // 2
-    CHARCONST, // 3
-    STRINGCONST, // 4
-    OPERATOR, // 5
-    PLUS, // 6
-    MINUS, // 7
-    MULTIPLY, // 8
-    DIVIDE, // 9
-    EQUALS, // 10
-    EQUALS_EQUALS, // 11
-    NOT_EQUALS, // 12
-    LESS, // 13
-    LESS_EQUALS, // 14
-    GREATER, // 15
-    GREATER_EQUALS, // 16
-    AND, // 17
-    OR, // 18
-    NOT, // 19
-    LPAREN, // 20
-    RPAREN, // 21
-    LBRACE, // 22
-    RBRACE, // 23
-    LBRACKET, // 24
-    RBRACKET, // 25
-    COMMA, // 26
-    SEMICOLON, // 27
-    END_OF_FILE
+    UNDEF,// 0 Token indefinido
+    IDENTIFIER, // 1 ID
+    INTCONST, // 2 Constante inteira
+    CHARCONST, // 3 Constante caractere
+    STRINGCONST, // 4 Constante string
+    OPERATOR, // 5 Operador
+    PLUS, // 6 +
+    MINUS, // 7 -
+    MULTIPLY, // 8 *
+    DIVIDE, // 9 /
+    EQUALS, // 10 =
+    EQUALS_EQUALS, // 11 ==
+    NOT_EQUALS, // 12 !=
+    LESS, // 13 <
+    LESS_EQUALS, // 14 <=
+    GREATER, // 15 >
+    GREATER_EQUALS, // 16 >=
+    AND, // 17 &&
+    OR, // 18 ||
+    NOT, // 19 !
+    LPAREN, // 20 (
+    RPAREN, // 21 )
+    LBRACE, // 22 {
+    RBRACE, // 23 }
+    LBRACKET, // 24 [
+    RBRACKET, // 25 ]
+    COMMA, // 26 ,
+    SEMICOLON, // 27 ;
+    INT, // 28 int
+    CHAR, // 29 char
+    VOID, // 30 void
+    IF, // 31 if
+    ELSE, // 32 else
+    WHILE, // 33 while
+    FOR, // 34 for
+    RETURN, // 35 return
+    END_OF_FILE //  EOF
 };
 
 class Token 

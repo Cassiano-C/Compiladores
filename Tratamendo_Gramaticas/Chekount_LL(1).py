@@ -370,13 +370,202 @@ if __name__ == "__main__":
         'ExpressionTail': [['(', 'OptionalExpressionList', ')'], ['[', 'Expression', ']'], ['ε']],
     }
 
+    grammar = {
+        "Program": [
+            ["FunctionList", "EOF"]
+        ],
+        
+        "FunctionList": [
+            ["Function", "FunctionList"],
+            ["ε"]  # ε
+        ],
+        
+        "Function": [
+            ["Type", "ID", "(", "ParamTypes", ")", "{", "Declarations", "StatementList", "}"],
+            ["void", "ID", "(", "ParamTypes", ")", "{", "Declarations", "StatementList", "}"]
+        ],
+        
+        "Declarations": [
+            ["Type", "VarDeclaration", "VarDeclarationList", ";", "Declarations"],
+            ["ε"]  # ε
+        ],
+        
+        "VarDeclarationList": [
+            [",", "VarDeclaration", "VarDeclarationList"],
+            ["ε"]  # ε
+        ],
+        
+        "VarDeclaration": [
+            ["ID", "VarArrayTail"]
+        ],
+        
+        "VarArrayTail": [
+            ["[", "integerconstant", "]"],
+            ["ε"]  # ε
+        ],
+        
+        "Type": [
+            ["char"],
+            ["int"]
+        ],
+        
+        "ParamTypes": [
+            ["void"],
+            ["Type", "ID", "ParamArrayTail", "ParamTypesTail"]
+        ],
+        
+        "ParamArrayTail": [
+            ["[", "]"],
+            ["ε"]  # ε
+        ],
+        
+        "ParamTypesTail": [
+            [",", "Type", "ID", "ParamArrayTail", "ParamTypesTail"],
+            ["ε"]  # ε
+        ],
+        
+        "Statement": [
+            ["if", "(", "Expression", ")", "Statement", "IfTail"],
+            ["while", "(", "Expression", ")", "Statement"],
+            ["for", "(", "ForInit", ";", "ForCondition", ";", "ForUpdate", ")", "Statement"],
+            ["return", "ReturnTail"],
+            ["ID", "IdStatementTail", ";"],
+            ["{", "StatementList", "}"],
+            [";"]
+        ],
+        
+        "IfTail": [
+            ["else", "Statement"],
+            ["ε"]  # ε
+        ],
+        
+        "ReturnTail": [
+            ["Expression", ";"],
+            [";"]
+        ],
+        
+        "ForInit": [
+            ["ID", "IdStatementTail"],
+            ["ε"]  # ε
+        ],
+        
+        "ForCondition": [
+            ["Expression"],
+            ["ε"]  # ε
+        ],
+        
+        "ForUpdate": [
+            ["ID", "IdStatementTail"],
+            ["ε"]  # ε
+        ],
+        
+        "StatementList": [
+            ["Statement", "StatementList"],
+            ["ε"]  # ε
+        ],
+        
+        "IdStatementTail": [
+            ["[", "Expression", "]", "=", "Expression"],
+            ["=", "Expression"],
+            ["(", "ExpressionList", ")"]
+        ],
+        
+        "Expression": [
+            ["Expr_And", "Expression’"]
+        ],
+        
+        "Expression’": [
+            ["||", "Expr_And", "Expression’"],
+            ["ε"]  # ε
+        ],
+        
+        "Expr_And": [
+            ["Expr_Rel", "Expr_And’"]
+        ],
+        
+        "Expr_And’": [
+            ["&&", "Expr_Rel", "Expr_And’"],
+            ["ε"]  # ε
+        ],
+        
+        "Expr_Rel": [
+            ["Expr_Add", "Expr_Rel’"]
+        ],
+        
+        "Expr_Rel’": [
+            ["RelOp", "Expr_Add", "Expr_Rel’"],
+            ["ε"]  # ε
+        ],
+        
+        "Expr_Add": [
+            ["Expr_Mult", "Expr_Add’"]
+        ],
+        
+        "Expr_Add’": [
+            ["AddOp", "Expr_Mult", "Expr_Add’"],
+            ["ε"]  # ε
+        ],
+        
+        "Expr_Mult": [
+            ["Expr_Unary", "Expr_Mult’"]
+        ],
+        
+        "Expr_Mult’": [
+            ["MultOp", "Expr_Unary", "Expr_Mult’"],
+            ["ε"]  # ε
+        ],
+        
+        "Expr_Unary": [
+            ["-", "Expr_Unary"],
+            ["!", "Expr_Unary"],
+            ["Primary"]
+        ],
+        
+        "Primary": [
+            ["ID", "PrimarTail"],
+            ["(", "Expression", ")"],
+            ["integerconstant"],
+            ["charconstant"],
+            ["stringconstant"]
+        ],
+        
+        "PrimarTail": [
+            ["(", "ExpressionList", ")"],
+            ["[", "Expression", "]"],
+            ["ε"]  # ε
+        ],
+        
+        "ExpressionList": [
+            ["Expression", "ExpressionListTail"],
+            ["ε"]  # ε
+        ],
+        
+        "ExpressionListTail": [
+            [",", "Expression", "ExpressionListTail"],
+            ["ε"]  # ε
+        ],
+        
+        "AddOp": [
+            ["+"], ["-"]
+        ],
+        
+        "MultOp": [
+            ["*"], ["/"]
+        ],
+        
+        "RelOp": [
+            ["=="], ["!="], ["<="], ["<"], [">="], [">"]
+        ]
+    }
+    
     print(f"\n{COR_OP}=== Gramática Original ==={RESET}")
-    imprimir_gramatica(gramatica_linguagem)
+    imprimir_gramatica(grammar)
 
-    print(f"\n{COR_OP}=== 1. Tratamento da Gramática ==={RESET}")
-    g_sem_recursao = eliminar_recursao_esquerda(gramatica_linguagem)
-    g_final = fatorar_esquerda(g_sem_recursao)
-    imprimir_gramatica(g_final)
+    #print(f"\n{COR_OP}=== 1. Tratamento da Gramática ==={RESET}")
+    #g_sem_recursao = eliminar_recursao_esquerda(grammar)
+    #g_final = fatorar_esquerda(g_sem_recursao)
+    #imprimir_gramatica(g_final)
+    g_final = grammar
 
     # Cálculos teóricos
     firsts = calcular_first(g_final)

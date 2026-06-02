@@ -1,5 +1,7 @@
 #include "scanner.h"
 
+
+// é um analisador sintático preditivo recursivo descendente, ou seja, é um analisador sintático que utiliza uma abordagem de análise top-down para construir a árvore de derivação da gramática. Ele é chamado de "previsível" porque pode prever qual produção usar com base no próximo token de entrada, sem a necessidade de backtracking. O "recursivo descendente" refere-se ao fato de que o analisador chama recursivamente funções para processar as regras da gramática.
 class Parser
 {
     private:

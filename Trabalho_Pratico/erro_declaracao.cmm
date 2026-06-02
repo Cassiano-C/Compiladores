@@ -1,0 +1,15 @@
+int calcular(int valor) {
+    int resultado;
+    resultado = valor * 2;
+    
+    int erro_aqui; // ERRO! Declaração de variável após uma atribuição executável.
+    
+    return resultado;
+}
+
+int main(void) {
+    int x;
+    x = 10;
+    processar_dados('S', x);
+    return 0;
+}

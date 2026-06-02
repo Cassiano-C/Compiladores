@@ -1,0 +1,40 @@
+int calcular_dobro(int valor) {
+    int resultado;
+    resultado = valor * 2;
+    return resultado;
+}
+
+void processar_dados(char opcao, int limite) {
+    int i;
+    int vetor[10];
+    char flag;
+
+    flag = 'A';
+
+    i = 0;
+    while (i < limite) {
+        vetor[i] = i + 1;
+        i = i + 1;
+    }
+
+    if (opcao == 'S') {
+        i = 0;
+    } else {
+        i = 1;
+    }
+
+    for (i = 0; i < 5; i = i + 1) {
+        if (vetor[i] > 2 && ! (flag == 'B')) {
+            vetor[i] = calcular_dobro(vetor[i]);
+        }
+    }
+
+    return;
+}
+
+int main(void) {
+    int x;
+    x = 10;
+    processar_dados('S', x);
+    return 0;
+}

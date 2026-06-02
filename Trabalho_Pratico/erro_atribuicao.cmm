@@ -1,0 +1,17 @@
+void processar(char opcao) {
+    char flag;
+    flag = 'A';
+    
+    if (opcao == 'S') {
+        flag = 'B';
+    }
+}
+
+int main(void) {
+    int x;
+    x = 10;
+    
+    10 = x; // ERRO! Não se pode atribuir um valor a uma constante literal numérica.
+    
+    return 0;
+}

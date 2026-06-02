@@ -1,3 +1,5 @@
 main
+compilador
 *.o
 *.out
+*.txt

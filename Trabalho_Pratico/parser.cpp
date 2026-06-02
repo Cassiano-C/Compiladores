@@ -199,375 +199,12 @@ Parser::run()
 }
 
 // Parte do Felipe
-void Parser::program()
-{
-	if (lToken->name == CHAR || lToken->name == INT || lToken->name == VOID)
-	{
-		functionlist();
-		match(END_OF_FILE);
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
 
-void Parser::functionlist()
-{
-	if (lToken->name == CHAR || lToken->name == INT || lToken->name == VOID)
-	{
-		function();
-		functionlist();
-	}
-	else if (lToken->name == END_OF_FILE)
-	{
-		// ε
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::function()
-{
-	if (lToken->name == CHAR || lToken->name == INT)
-	{
-		type();
-		match(IDENTIFIER);
-		match(LPAREN);
-		paramTypes();
-		match(RPAREN);
-		match(LBRACE);
-		declarations();
-		statementList();
-		match(RBRACE);
-	}
-	else if (lToken->name == VOID)
-	{
-		match(VOID);
-		match(IDENTIFIER);
-		match(LPAREN);
-		paramTypes();
-		match(RPAREN);
-		match(LBRACE);
-		declarations();
-		statementList();
-		match(RBRACE);
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::declarations()
-{
-	if (lToken->name == CHAR || lToken->name == INT)
-	{
-		type();
-		varDeclaration();
-		varDeclarationList();
-		match(SEMICOLON);
-		declarations();
-	}
-	else if (lToken->name == SEMICOLON || lToken->name == IDENTIFIER || lToken->name == FOR || lToken->name == IF || lToken->name == RETURN || lToken->name == WHILE || lToken->name == LBRACE || lToken->name == RBRACE)
-	{
-		// ε
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::varDeclarationList()
-{
-	if (lToken->name == COMMA)
-	{
-		match(COMMA);
-		varDeclaration();
-		varDeclarationList();
-	}
-	else if (lToken->name == SEMICOLON)
-	{
-		// ε
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::varDeclaration()
-{
-	if (lToken->name == IDENTIFIER)
-	{
-		match(IDENTIFIER);
-		varArrayTail();
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::varArrayTail()
-{
-	if (lToken->name == LBRACKET)
-	{
-		match(LBRACKET);
-		match(INTCONST);
-		match(RBRACKET);
-	}
-	else if (lToken->name == COMMA || lToken->name == SEMICOLON)
-	{
-		// ε
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::type()
-{
-	if (lToken->name == CHAR)
-	{
-		match(CHAR);
-	}
-	else if (lToken->name == INT)
-	{
-		match(INT);
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::paramTypes()
-{
-	if (lToken->name == VOID)
-	{
-		match(VOID);
-	}
-	else if (lToken->name == CHAR || lToken->name == INT)
-	{
-		type();
-		match(IDENTIFIER);
-		paramArrayTail();
-		paramTypesTail();
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::paramArrayTail()
-{
-	if (lToken->name == LBRACKET)
-	{
-		match(LBRACKET);
-		match(RBRACKET);
-	}
-	else if (lToken->name == RPAREN || lToken->name == COMMA)
-	{
-		// ε
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::paramTypesTail()
-{
-	if (lToken->name == COMMA)
-	{
-		match(COMMA);
-		type();
-		match(IDENTIFIER);
-		paramArrayTail();
-		paramTypesTail();
-	}
-	else if (lToken->name == RPAREN)
-	{
-		// ε
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::statement()
-{
-	if (lToken->name == IF)
-	{
-		match(IF);
-		match(LPAREN);
-		expression();
-		match(RPAREN);
-		statement();
-		ifTail();
-	}
-	else if (lToken->name == WHILE)
-	{
-		match(WHILE);
-		match(LPAREN);
-		expression();
-		match(RPAREN);
-		statement();
-	}
-	else if (lToken->name == FOR)
-	{
-		match(FOR);
-		match(LPAREN);
-		forInit();
-		match(SEMICOLON);
-		forCondition();
-		match(SEMICOLON);
-		forUpdate();
-		match(RPAREN);
-		statement();
-	}
-	else if (lToken->name == RETURN)
-	{
-		match(RETURN);
-		returnTail();
-	}
-	else if (lToken->name == IDENTIFIER)
-	{
-		match(IDENTIFIER);
-		idStatementTail();
-		match(SEMICOLON);
-	}
-	else if (lToken->name == LBRACE)
-	{
-		match(LBRACE);
-		statementList();
-		match(RBRACE);
-	}
-	else if (lToken->name == SEMICOLON)
-	{
-		match(SEMICOLON);
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::ifTail()
-{
-	if (lToken->name == ELSE)
-	{
-		match(ELSE);
-		statement();
-	}
-	else if (lToken->name == SEMICOLON || lToken->name == IDENTIFIER || lToken->name == ELSE || lToken->name == FOR || lToken->name == IF || lToken->name == RETURN || lToken->name == WHILE || lToken->name == LBRACE || lToken->name == RBRACE)
-	{
-		// ε
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::returnTail()
-{
-	if (lToken->name == NOT || lToken->name == LPAREN || lToken->name == MINUS || lToken->name == IDENTIFIER || lToken->name == CHARCONST || lToken->name == INTCONST || lToken->name == STRINGCONST)
-	{
-		expression();
-		match(SEMICOLON);
-	}
-	else if (lToken->name == SEMICOLON)
-	{
-		match(SEMICOLON);
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::forInit()
-{
-	if (lToken->name == IDENTIFIER)
-	{
-		match(IDENTIFIER);
-		idStatementTail();
-	}
-	else if (lToken->name == SEMICOLON)
-	{
-		// ε
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::forCondition()
-{
-	if (lToken->name == NOT || lToken->name == LPAREN || lToken->name == MINUS || lToken->name == IDENTIFIER || lToken->name == CHARCONST || lToken->name == INTCONST || lToken->name == STRINGCONST)
-	{
-		expression();
-	}
-	else if (lToken->name == SEMICOLON)
-	{
-		// ε
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::forUpdate()
-{
-	if (lToken->name == IDENTIFIER)
-	{
-		match(IDENTIFIER);
-		idStatementTail();
-	}
-	else if (lToken->name == RPAREN)
-	{
-		// ε
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::statementList()
-{
-	if (lToken->name == SEMICOLON || lToken->name == IDENTIFIER || lToken->name == FOR || lToken->name == IF || lToken->name == RETURN || lToken->name == WHILE || lToken->name == LBRACE)
-	{
-		statement();
-		statementList();
-	}
-	else if (lToken->name == RBRACE)
-	{
-		// ε
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::idStatementTail()
-{
-	if (lToken->name == LBRACKET)
-	{
-		match(LBRACKET);
-		expression();
-		match(RBRACKET);
-		match(EQUALS);
-		expression();
-	}
-	else if (lToken->name == EQUALS)
-	{
-		match(EQUALS);
-		expression();
-	}
-	else if (lToken->name == LPAREN)
-	{
-		match(LPAREN);
-		expression_list();
-		match(RPAREN);
-	}
-	else if (lToken->name == SEMICOLON || lToken->name == RBRACKET || lToken->name == EQUALS || lToken->name == LPAREN)
-	{
-		// ε
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
-
-void Parser::expression()
-{
-	if (lToken->name == NOT || lToken->name == LPAREN || lToken->name == MINUS || lToken->name == IDENTIFIER || lToken->name == CHARCONST || lToken->name == INTCONST || lToken->name == STRINGCONST)
-	{
-		expression1();
-	}
-	else
-		error("Token inesperado: " + lToken->lexeme);
-}
 
 // Parte do Cassiano
 void Parser::expression1()
 {
-	if (lToken->name == OR)
+	if (lToken->attribute == OR)
 	{
 		match(OR);
 		espr_and();
@@ -583,7 +220,7 @@ void Parser::expression1()
 
 void Parser::espr_and()
 {
-	if (lToken->name == NOT || lToken->name == LPAREN || lToken->name == MINUS || lToken->name == IDENTIFIER || lToken->name == CHARCONST || lToken->name == INTCONST || lToken->name == STRINGCONST)
+	if (lToken->attribute == NOT || lToken->name == LPAREN || lToken->attribute == MINUS || lToken->name == IDENTIFIER || lToken->name == CHARCONST || lToken->name == INTCONST || lToken->name == STRINGCONST)
 	{
 		espr_rel();
 		espr_and1();
@@ -594,13 +231,13 @@ void Parser::espr_and()
 
 void Parser::espr_and1()
 {
-	if (lToken->name == AND)
+	if (lToken->attribute == AND)
 	{
 		match(AND);
 		espr_rel();
 		espr_and1();
 	}
-	else if (lToken->name == SEMICOLON || lToken->name == COMMA || lToken->name == RPAREN || lToken->name == RBRACKET || lToken->name == RBRACE || lToken->name == OR)
+	else if (lToken->name == SEMICOLON || lToken->name == COMMA || lToken->name == RPAREN || lToken->name == RBRACKET || lToken->name == RBRACE || lToken->attribute == OR)
 	{
 		// ε
 	}
@@ -611,7 +248,7 @@ void Parser::espr_and1()
 
 void Parser::espr_rel()
 {
-	if (lToken->name == NOT || lToken->name == LPAREN || lToken->name == MINUS || lToken->name == IDENTIFIER || lToken->name == CHARCONST || lToken->name == INTCONST || lToken->name == STRINGCONST)
+	if (lToken->attribute == NOT || lToken->name == LPAREN || lToken->attribute == MINUS || lToken->name == IDENTIFIER || lToken->name == CHARCONST || lToken->name == INTCONST || lToken->name == STRINGCONST)
 	{
 		espr_add();
 		espr_rel1();
@@ -623,13 +260,13 @@ void Parser::espr_rel()
 
 void Parser::espr_rel1()
 {
-	if (lToken->name == EQUALS_EQUALS || lToken->name == NOT_EQUALS || lToken->name == LESS || lToken->name == LESS_EQUALS || lToken->name == GREATER || lToken->name == GREATER_EQUALS)
+	if (lToken->attribute == EQUALS_EQUALS || lToken->attribute == NOT_EQUALS || lToken->attribute == LESS || lToken->attribute == LESS_EQUALS || lToken->attribute == GREATER || lToken->attribute == GREATER_EQUALS)
 	{
-		match(lToken->name); // RelOp
+		match(lToken->attribute); // RelOp
 		espr_add();
 		espr_rel1();
 	}
-	else if (lToken->name == AND || lToken->name == RPAREN || lToken->name == COMMA || lToken->name == SEMICOLON || lToken->name == RBRACKET || lToken->name == RBRACE || lToken->name == OR)
+	else if (lToken->attribute == AND || lToken->name == RPAREN || lToken->name == COMMA || lToken->name == SEMICOLON || lToken->name == RBRACKET || lToken->name == RBRACE || lToken->attribute == OR)
 	{
 		// ε
 	}
@@ -639,7 +276,7 @@ void Parser::espr_rel1()
 
 void Parser::espr_add()
 {
-	if (lToken->name == NOT || lToken->name == LPAREN || lToken->name == MINUS || lToken->name == IDENTIFIER || lToken->name == CHARCONST || lToken->name == INTCONST || lToken->name == STRINGCONST)
+	if (lToken->attribute == NOT || lToken->name == LPAREN || lToken->attribute == MINUS || lToken->name == IDENTIFIER || lToken->name == CHARCONST || lToken->name == INTCONST || lToken->name == STRINGCONST)
 	{
 		espr_mult();
 		espr_add1();
@@ -650,16 +287,16 @@ void Parser::espr_add()
 
 void Parser::espr_add1()
 {
-	if (lToken->name == PLUS || lToken->name == MINUS)
+	if (lToken->attribute == PLUS || lToken->attribute == MINUS)
 	{
-		match(lToken->name); // AddOp
+		match(lToken->attribute); // AddOp
 		espr_mult();
 		espr_add1();
 	}
-	else if (lToken->name == EQUALS_EQUALS || lToken->name == NOT_EQUALS || lToken->name == LESS || 
-		lToken->name == LESS_EQUALS || lToken->name == GREATER || lToken->name == GREATER_EQUALS || 
-		lToken->name == AND || lToken->name == RPAREN || lToken->name == COMMA || lToken->name == SEMICOLON || 
-		lToken->name == RBRACKET || lToken->name == RBRACE || lToken->name == OR)
+	else if (lToken->attribute == EQUALS_EQUALS || lToken->attribute == NOT_EQUALS || lToken->attribute == LESS ||
+			 lToken->attribute == LESS_EQUALS || lToken->attribute == GREATER || lToken->attribute == GREATER_EQUALS ||
+			 lToken->attribute == AND || lToken->name == RPAREN || lToken->name == COMMA || lToken->name == SEMICOLON ||
+			 lToken->name == RBRACKET || lToken->name == RBRACE || lToken->attribute == OR)
 	{
 		// ε
 	}
@@ -669,7 +306,7 @@ void Parser::espr_add1()
 
 void Parser::espr_mult()
 {
-	if (lToken->name == NOT || lToken->name == LPAREN || lToken->name == MINUS || lToken->name == IDENTIFIER || lToken->name == CHARCONST || lToken->name == INTCONST || lToken->name == STRINGCONST)
+	if (lToken->attribute == NOT || lToken->name == LPAREN || lToken->attribute == MINUS || lToken->name == IDENTIFIER || lToken->name == CHARCONST || lToken->name == INTCONST || lToken->name == STRINGCONST)
 	{
 		espr_unary();
 		espr_mult1();
@@ -680,17 +317,17 @@ void Parser::espr_mult()
 
 void Parser::espr_mult1()
 {
-	if (lToken->name == MULTIPLY || lToken->name == DIVIDE)
+	if (lToken->attribute == MULTIPLY || lToken->attribute == DIVIDE)
 	{
-		match(lToken->name); // MultOp
+		match(lToken->attribute); // MultOp
 		espr_unary();
 		espr_mult1();
 	}
-	else if (lToken->name == EQUALS_EQUALS || lToken->name == NOT_EQUALS || lToken->name == LESS || 
-		lToken->name == LESS_EQUALS || lToken->name == GREATER || lToken->name == GREATER_EQUALS || 
-		lToken->name == AND || lToken->name == RPAREN || lToken->name == PLUS || lToken->name == COMMA || 
-		lToken->name == MINUS || lToken->name == SEMICOLON || lToken->name == RBRACKET || lToken->name == RBRACE || 
-		lToken->name == OR)
+	else if (lToken->attribute == EQUALS_EQUALS || lToken->attribute == NOT_EQUALS || lToken->attribute == LESS ||
+			 lToken->attribute == LESS_EQUALS || lToken->attribute == GREATER || lToken->attribute == GREATER_EQUALS ||
+			 lToken->attribute == AND || lToken->name == RPAREN || lToken->attribute == PLUS || lToken->name == COMMA ||
+			 lToken->attribute == MINUS || lToken->name == SEMICOLON || lToken->name == RBRACKET || lToken->name == RBRACE ||
+			 lToken->attribute == OR)
 	{
 		// ε
 	}
@@ -700,12 +337,12 @@ void Parser::espr_mult1()
 
 void Parser::espr_unary()
 {
-	if (lToken->name == MINUS)
+	if (lToken->attribute == MINUS)
 	{
 		match(MINUS);
 		espr_unary();
 	}
-	else if (lToken->name == NOT)
+	else if (lToken->attribute == NOT)
 	{
 		match(NOT);
 		espr_unary();
@@ -728,7 +365,7 @@ void Parser::primary()
 	else if (lToken->name == LPAREN)
 	{
 		match(LPAREN);
-		expression1();
+		expression();
 		match(RPAREN);
 	}
 	else if (lToken->name == INTCONST)
@@ -759,14 +396,14 @@ void Parser::primary_tail()
 	else if (lToken->name == LBRACKET)
 	{
 		match(LBRACKET);
-		expression1();
+		expression();
 		match(RBRACKET);
 	}
-	else if (lToken->name == EQUALS_EQUALS || lToken->name == NOT_EQUALS || lToken->name == LESS || 
-		lToken->name == LESS_EQUALS || lToken->name == GREATER || lToken->name == GREATER_EQUALS || 
-		lToken->name == AND || lToken->name == RPAREN || lToken->name == MULTIPLY || lToken->name == PLUS || 
-		lToken->name == COMMA || lToken->name == MINUS || lToken->name == DIVIDE || lToken->name == SEMICOLON || 
-		lToken->name == RBRACKET || lToken->name == RBRACE || lToken->name == OR)
+	else if (lToken->attribute == EQUALS_EQUALS || lToken->attribute == NOT_EQUALS || lToken->attribute == LESS ||
+			 lToken->attribute == LESS_EQUALS || lToken->attribute == GREATER || lToken->attribute == GREATER_EQUALS ||
+			 lToken->attribute == AND || lToken->name == RPAREN || lToken->attribute == MULTIPLY || lToken->attribute == PLUS ||
+			 lToken->name == COMMA || lToken->attribute == MINUS || lToken->attribute == DIVIDE || lToken->name == SEMICOLON ||
+			 lToken->name == RBRACKET || lToken->name == RBRACE || lToken->attribute == OR)
 	{
 		// ε
 	}
@@ -776,9 +413,10 @@ void Parser::primary_tail()
 
 void Parser::expression_list()
 {
-	if (lToken->name == NOT || lToken->name == LPAREN || lToken->name == MINUS || lToken->name == IDENTIFIER || lToken->name == CHARCONST || lToken->name == INTCONST || lToken->name == STRINGCONST)
+	if (lToken->attribute == NOT || lToken->name == LPAREN || lToken->attribute == MINUS || lToken->name == IDENTIFIER || 
+		lToken->name == CHARCONST || lToken->name == INTCONST || lToken->name == STRINGCONST)
 	{
-		expression1();
+		expression();
 		expression_list_tail();
 	}
 	else if (lToken->name == RPAREN)
@@ -794,7 +432,7 @@ void Parser::expression_list_tail()
 	if (lToken->name == COMMA)
 	{
 		match(COMMA);
-		expression1();
+		expression();
 		expression_list_tail();
 	}
 	else if (lToken->name == RPAREN)
@@ -807,11 +445,11 @@ void Parser::expression_list_tail()
 
 void Parser::add_op()
 {
-	if (lToken->name == PLUS)
+	if (lToken->attribute == PLUS)
 	{
 		match(PLUS);
 	}
-	else if (lToken->name == MINUS)
+	else if (lToken->attribute == MINUS)
 	{
 		match(MINUS);
 	}
@@ -821,11 +459,11 @@ void Parser::add_op()
 
 void Parser::mult_op()
 {
-	if (lToken->name == MULTIPLY)
+	if (lToken->attribute == MULTIPLY)
 	{
 		match(MULTIPLY);
 	}
-	else if (lToken->name == DIVIDE)
+	else if (lToken->attribute == DIVIDE)
 	{
 		match(DIVIDE);
 	}
@@ -835,27 +473,27 @@ void Parser::mult_op()
 
 void Parser::rel_op()
 {
-	if (lToken->name == EQUALS_EQUALS)
+	if (lToken->attribute == EQUALS_EQUALS)
 	{
 		match(EQUALS_EQUALS);
 	}
-	else if (lToken->name == NOT_EQUALS)
+	else if (lToken->attribute == NOT_EQUALS)
 	{
 		match(NOT_EQUALS);
 	}
-	else if (lToken->name == LESS)
+	else if (lToken->attribute == LESS)
 	{
 		match(LESS);
 	}
-	else if (lToken->name == LESS_EQUALS)
+	else if (lToken->attribute == LESS_EQUALS)
 	{
 		match(LESS_EQUALS);
 	}
-	else if (lToken->name == GREATER)
+	else if (lToken->attribute == GREATER)
 	{
 		match(GREATER);
 	}
-	else if (lToken->name == GREATER_EQUALS)
+	else if (lToken->attribute == GREATER_EQUALS)
 	{
 		match(GREATER_EQUALS);
 	}
@@ -885,10 +523,8 @@ void Parser::initializeSymbolTable()
 	globalTable->add(new STEntry(t,true));
 }
 
-void
-Parser::error(string str)
+void Parser::error(string str)
 {
 	cout << "Linha " << scanner->getLine() << ": " << str << endl;
-
 	exit(EXIT_FAILURE);
 }

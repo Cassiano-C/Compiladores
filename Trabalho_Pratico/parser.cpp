@@ -199,8 +199,300 @@ Parser::run()
 }
 
 // Parte do Felipe
+// ==========================================
+// Parte do Felipe
+// ==========================================
 
+void Parser::program() {
+    if (lToken->name == END_OF_FILE || lToken->name == CHAR || lToken->name == INT || lToken->name == VOID) {
+        functionlist();
+        match(END_OF_FILE);
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
 
+void Parser::functionlist() {
+    if (lToken->name == CHAR || lToken->name == INT || lToken->name == VOID) {
+        function();
+        functionlist();
+    } else if (lToken->name == END_OF_FILE) {
+        // ε
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::function() {
+    if (lToken->name == CHAR || lToken->name == INT) {
+        type();
+        match(IDENTIFIER);
+        match(LPAREN);
+        paramtypes();
+        match(RPAREN);
+        match(LBRACE);
+        declarations();
+        statementlist();
+        match(RBRACE);
+    } else if (lToken->name == VOID) {
+        match(VOID);
+        match(IDENTIFIER);
+        match(LPAREN);
+        paramtypes();
+        match(RPAREN);
+        match(LBRACE);
+        declarations();
+        statementlist();
+        match(RBRACE);
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::declarations() {
+    if (lToken->name == CHAR || lToken->name == INT) {
+        type();
+        vardeclaration();
+        vardeclarationlist();
+        match(SEMICOLON);
+        declarations();
+    } else if (lToken->name == SEMICOLON || lToken->name == IDENTIFIER || 
+               lToken->name == FOR || lToken->name == IF || 
+               lToken->name == RETURN || lToken->name == WHILE || 
+               lToken->name == LBRACE || lToken->name == RBRACE) {
+        // ε
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::vardeclarationlist() {
+    if (lToken->name == COMMA) {
+        match(COMMA);
+        vardeclaration();
+        vardeclarationlist();
+    } else if (lToken->name == SEMICOLON) {
+        // ε
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::vardeclaration() {
+    if (lToken->name == IDENTIFIER) {
+        match(IDENTIFIER);
+        vararraytail();
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::vararraytail() {
+    if (lToken->name == LBRACKET) {
+        match(LBRACKET);
+        match(INTCONST);
+        match(RBRACKET);
+    } else if (lToken->name == COMMA || lToken->name == SEMICOLON) {
+        // ε
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::type() {
+    if (lToken->name == CHAR) {
+        match(CHAR);
+    } else if (lToken->name == INT) {
+        match(INT);
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::paramtypes() {
+    if (lToken->name == VOID) {
+        match(VOID);
+    } else if (lToken->name == CHAR || lToken->name == INT) {
+        type();
+        match(IDENTIFIER);
+        paramarraytail();
+        paramtypestail();
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::paramarraytail() {
+    if (lToken->name == LBRACKET) {
+        match(LBRACKET);
+        match(RBRACKET);
+    } else if (lToken->name == RPAREN || lToken->name == COMMA) {
+        // ε
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::paramtypestail() {
+    if (lToken->name == COMMA) {
+        match(COMMA);
+        type();
+        match(IDENTIFIER);
+        paramarraytail();
+        paramtypestail();
+    } else if (lToken->name == RPAREN) {
+        // ε
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::statement() {
+    if (lToken->name == IF) {
+        match(IF);
+        match(LPAREN);
+        expression();
+        match(RPAREN);
+        statement();
+        iftail();
+    } else if (lToken->name == WHILE) {
+        match(WHILE);
+        match(LPAREN);
+        expression();
+        match(RPAREN);
+        statement();
+    } else if (lToken->name == FOR) {
+        match(FOR);
+        match(LPAREN);
+        forinit();
+        match(SEMICOLON);
+        forcondition();
+        match(SEMICOLON);
+        forupdate();
+        match(RPAREN);
+        statement();
+    } else if (lToken->name == RETURN) {
+        match(RETURN);
+        returntail();
+    } else if (lToken->name == IDENTIFIER) {
+        match(IDENTIFIER);
+        idstatementtail();
+        match(SEMICOLON);
+    } else if (lToken->name == LBRACE) {
+        match(LBRACE);
+        statementlist();
+        match(RBRACE);
+    } else if (lToken->name == SEMICOLON) {
+        match(SEMICOLON);
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::iftail() {
+    if (lToken->name == ELSE) {
+        match(ELSE);
+        statement();
+    } else if (lToken->name == SEMICOLON || lToken->name == IDENTIFIER || 
+               lToken->name == ELSE || lToken->name == FOR || 
+               lToken->name == IF || lToken->name == RETURN || 
+               lToken->name == WHILE || lToken->name == LBRACE || 
+               lToken->name == RBRACE) {
+        // ε
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::returntail() {
+    if (lToken->attribute == NOT || lToken->name == LPAREN || lToken->attribute == MINUS || 
+        lToken->name == IDENTIFIER || lToken->name == CHARCONST || 
+        lToken->name == INTCONST || lToken->name == STRINGCONST) {
+        expression();
+        match(SEMICOLON);
+    } else if (lToken->name == SEMICOLON) {
+        match(SEMICOLON);
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::forinit() {
+    if (lToken->name == IDENTIFIER) {
+        match(IDENTIFIER);
+        idstatementtail();
+    } else if (lToken->name == SEMICOLON) {
+        // ε
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::forcondition() {
+    if (lToken->attribute == NOT || lToken->name == LPAREN || lToken->attribute == MINUS || 
+        lToken->name == IDENTIFIER || lToken->name == CHARCONST || 
+        lToken->name == INTCONST || lToken->name == STRINGCONST) {
+        expression();
+    } else if (lToken->name == SEMICOLON) {
+        // ε
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::forupdate() {
+    if (lToken->name == IDENTIFIER) {
+        match(IDENTIFIER);
+        idstatementtail();
+    } else if (lToken->name == RPAREN) {
+        // ε
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::statementlist() {
+    if (lToken->name == SEMICOLON || lToken->name == IDENTIFIER || lToken->name == FOR || 
+        lToken->name == IF || lToken->name == RETURN || lToken->name == WHILE || 
+        lToken->name == LBRACE) {
+        statement();
+        statementlist();
+    } else if (lToken->name == RBRACE) {
+        // ε
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::idstatementtail() {
+    if (lToken->name == LBRACKET) {
+        match(LBRACKET);
+        expression();
+        match(RBRACKET);
+        match(EQUALS); 
+        expression();
+    } else if (lToken->name == EQUALS || lToken->attribute == EQUALS) {
+        match(EQUALS);
+        expression();
+    } else if (lToken->name == LPAREN) {
+        match(LPAREN);
+        expression_list();
+        match(RPAREN);
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
+
+void Parser::expression() {
+    if (lToken->attribute == NOT || lToken->name == LPAREN || lToken->attribute == MINUS || 
+        lToken->name == IDENTIFIER || lToken->name == CHARCONST || 
+        lToken->name == INTCONST || lToken->name == STRINGCONST) {
+        espr_and();
+        expression1();
+    } else {
+        error("Token inesperado: " + lToken->lexeme);
+    }
+}
 // Parte do Cassiano
 void Parser::expression1()
 {

@@ -92,7 +92,26 @@ class Parser
 		void match(int);
 
 		// Parte do Felipe
-		
+		void program();
+        void functionlist();
+        void function();
+        void declarations();
+        void vardeclarationlist();
+        void vardeclaration();
+        void vararraytail();
+        void type();
+        void paramtypes();
+        void paramarraytail();
+        void paramtypestail();
+        void statement();
+        void iftail();
+        void returntail();
+        void forinit();
+        void forcondition();
+        void forupdate();
+        void statementlist();
+        void idstatementtail();
+        void expression();
 
 		// Parte cassiano
         void expression1();

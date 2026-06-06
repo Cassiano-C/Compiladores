@@ -200,8 +200,6 @@ Parser::run()
 
 // Parte do Felipe
 // ==========================================
-// Parte do Felipe
-// ==========================================
 
 void Parser::program() {
     if (lToken->name == END_OF_FILE || lToken->name == CHAR || lToken->name == INT || lToken->name == VOID) {
@@ -471,7 +469,7 @@ void Parser::idstatementtail() {
         match(RBRACKET);
         match(EQUALS); 
         expression();
-    } else if (lToken->name == EQUALS || lToken->attribute == EQUALS) {
+    } else if (lToken->attribute == EQUALS) {
         match(EQUALS);
         expression();
     } else if (lToken->name == LPAREN) {

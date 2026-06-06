@@ -1,6 +1,8 @@
 #include <iostream>
 #include <ctype.h>//Funções de caracteres
 #include <string>
+#include <vector>
+#include <algorithm>
 
 using namespace std;
 

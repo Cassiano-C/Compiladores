@@ -1,12 +1,9 @@
 #include "scanner.h"    
 
-//Construtor que recebe uma string com o nome do arquivo 
-//de entrada e preenche input com seu conteúdo.
+// Construtor que recebe uma string com o nome do arquivo 
+// de entrada e preenche input com seu conteúdo.
 Scanner::Scanner(string input, SymbolTable* st)
 {
-    /*this->input = input;
-    cout << "Entrada: " << input << endl << "Tamanho: " 
-         << input.length() << endl;*/
     pos = 0;
     line = 1;
 
@@ -17,20 +14,16 @@ Scanner::Scanner(string input, SymbolTable* st)
 
     if (inputFile.is_open())
     {
-        while (getline(inputFile,line) )
+        while (getline(inputFile, line))
         {
             this->input.append(line + '\n');
         }
         inputFile.close();
     }
     else 
+    {
         cout << "Unable to open file\n"; 
-
-    //A próxima linha deve ser comentada posteriormente.
-    //Ela é utilizada apenas para verificar se o 
-    //preenchimento de input foi feito corretamente.
-    cout << this->input;
-
+    }
 }
 
 int
@@ -39,16 +32,15 @@ Scanner::getLine()
     return line;
 }
 
-//Método que retorna o próximo token da entrada
-Token* 
-Scanner::nextToken()
+// Método que retorna o próximo token da entrada
+Token* Scanner::nextToken()
 {
-    Token* tok;
+    Token* tok = nullptr;
     string lexeme;
 
-    while (isspace(input[pos])) // Ignora espaços em branco e as quebras de linha
+    while (pos < input.length() && isspace(input[pos])) // Ignora espaços em branco e as quebras de linha
     {
-        if(input[pos] == '\n')
+        if (input[pos] == '\n')
             line++;
         pos++;
     }
@@ -56,12 +48,11 @@ Scanner::nextToken()
     if (pos >= input.length() || input[pos] == '\0')
     {
         tok = new Token(END_OF_FILE, "EOF");
-        
     }
-    else if(input[pos] == '"')
+    else if (input[pos] == '"')
     {
         pos++; // pula a aspa inicial
-        while (isprint(input[pos]) && input[pos] != '"')
+        while (pos < input.length() && isprint(input[pos]) && input[pos] != '"')
         {
             if (input[pos] == '\n')
                 line++;
@@ -70,15 +61,14 @@ Scanner::nextToken()
         }
         pos++; // pula a aspa final
         tok = new Token(STRINGCONST, lexeme);
-        
     }
-    else if(input[pos] == '\'') // encontra as aspas simples
+    else if (input[pos] == '\'') // encontra as aspas simples
     {
         pos++; // pula a aspa inicial
-        if(input[pos] == '\\')
+        if (pos < input.length() && input[pos] == '\\')
         {
             pos++; // pula a barra invertida
-            if(input[pos] == 'n' || input[pos] == '0')
+            if (pos < input.length() && (input[pos] == 'n' || input[pos] == '0'))
             {
                 lexeme += '\\'; // adiciona a barra invertida ao lexema
                 lexeme += input[pos]; // adiciona o caractere de escape ao lexema
@@ -89,13 +79,13 @@ Scanner::nextToken()
                 lexicalError("Caractere de escape inválido: \\" + string(1, input[pos]));
             }
         }
-        else if(isprint(input[pos]) && input[pos] != '\'' && input[pos] != '\\')
+        else if (pos < input.length() && isprint(input[pos]) && input[pos] != '\'' && input[pos] != '\\')
         {
             lexeme += input[pos];
             pos++;
         }
 
-        if(input[pos] == '\'')
+        if (pos < input.length() && input[pos] == '\'')
         {
             pos++; // pula a aspa final
             tok = new Token(CHARCONST, lexeme);
@@ -104,22 +94,24 @@ Scanner::nextToken()
         {
             lexicalError("Caractere inválido em literal de caractere: " + string(1, input[pos]));
         }
-        
     }
-    else if(input[pos] == '/')
+    else if (input[pos] == '/')
     {
-        if(input[pos + 1] == '/')
+        if (pos + 1 < input.length() && input[pos + 1] == '/')
         {
             pos += 2; // vai pra posição do primeiro caractere após //
-            while (input[pos] != '\n')
+            while (pos < input.length() && input[pos] != '\n')
                 pos++;
-            line++;
+            if (pos < input.length() && input[pos] == '\n') {
+                line++;
+                pos++;
+            }
             return nextToken();
         }
-        else if(input[pos + 1] == '*')
+        else if (pos + 1 < input.length() && input[pos + 1] == '*')
         {
             pos += 2; // vai pra posição do primeiro caractere após /*
-            while (input[pos] != '*' || input[pos + 1] != '/')
+            while (pos + 1 < input.length() && (input[pos] != '*' || input[pos + 1] != '/'))
             {
                 if (input[pos] == '\n')
                     line++;
@@ -130,30 +122,30 @@ Scanner::nextToken()
         }
         else
         {
-            tok = new Token(OPERATOR, DIVIDE);
+            tok = new Token(OPERATOR, "/");
+            tok->attribute = DIVIDE;
             pos++;
         }
     }
-    else if(isdigit(input[pos]))
+    else if (isdigit(input[pos]))
     {
-        while (isdigit(input[pos]))
+        while (pos < input.length() && isdigit(input[pos]))
         {
             lexeme += input[pos];
             pos++;
         }
         tok = new Token(INTCONST, lexeme);
-        
     }
-    else if(isalpha(input[pos]))
+    else if (isalpha(input[pos]))
     {
-        while (isalpha(input[pos]) || isalnum(input[pos]) || input[pos] == '_')
+        while (pos < input.length() && (isalpha(input[pos]) || isalnum(input[pos]) || input[pos] == '_'))
         {
             lexeme += input[pos];
             pos++;
         }
-        tok = new Token(IDENTIFIER, lexeme);
+        
         STEntry* entry = st->get(lexeme);
-        if(!entry)
+        if (!entry)
         {
             tok = new Token(IDENTIFIER, lexeme);
         }
@@ -162,30 +154,27 @@ Scanner::nextToken()
             tok = new Token(entry->token->name, lexeme);
         }
     }
-    else if(input[pos] == '+')
+    else if (input[pos] == '+')
     {
         tok = new Token(OPERATOR, "+");
         tok->attribute = PLUS;
         pos++;
-        
     }
-    else if(input[pos] == '-')
+    else if (input[pos] == '-')
     {
         tok = new Token(OPERATOR, "-");
         tok->attribute = MINUS;
         pos++;
-        
     }
-    else if(input[pos] == '*')
+    else if (input[pos] == '*')
     {
         tok = new Token(OPERATOR, "*");
         tok->attribute = MULTIPLY;
         pos++;
-        
     }
-    else if(input[pos] == '=')
+    else if (input[pos] == '=')
     {
-        if(input[pos + 1] == '=')
+        if (pos + 1 < input.length() && input[pos + 1] == '=')
         {
             tok = new Token(OPERATOR, "==");
             tok->attribute = EQUALS_EQUALS;
@@ -197,16 +186,14 @@ Scanner::nextToken()
             tok->attribute = EQUALS;
             pos++;
         }
-        
     }
-    else if(input[pos] == '!')
+    else if (input[pos] == '!')
     {
-        if(input[pos + 1] == '=')
+        if (pos + 1 < input.length() && input[pos + 1] == '=')
         {
             tok = new Token(OPERATOR, "!=");
             tok->attribute = NOT_EQUALS;
             pos += 2;
-            
         }
         else
         {
@@ -215,9 +202,9 @@ Scanner::nextToken()
             pos++;
         }
     }
-    else if(input[pos] == '<')
+    else if (input[pos] == '<')
     {
-        if(input[pos + 1] == '=')
+        if (pos + 1 < input.length() && input[pos + 1] == '=')
         {
             tok = new Token(OPERATOR, "<=");
             tok->attribute = LESS_EQUALS;
@@ -229,99 +216,95 @@ Scanner::nextToken()
             tok->attribute = LESS;
             pos++;
         }
-        
     }
-    else if(input[pos] == '>')
+    else if (input[pos] == '>')
     {
-        if(input[pos + 1] == '=')
+        if (pos + 1 < input.length() && input[pos + 1] == '=')
         {
-            tok = new Token(OPERATOR, "'>='");
+            tok = new Token(OPERATOR, ">=");
             tok->attribute = GREATER_EQUALS;
             pos += 2;
         }
         else
         {
-            tok = new Token(OPERATOR, "'>");
+            tok = new Token(OPERATOR, ">");
             tok->attribute = GREATER;
             pos++;
         }
-        
     }
-    else if(input[pos] == '&' && input[pos + 1] == '&')
+    else if (pos + 1 < input.length() && input[pos] == '&' && input[pos + 1] == '&')
     {
         tok = new Token(OPERATOR, "&&");
         tok->attribute = AND;
         pos += 2;
-        
     }
-    else if(input[pos] == '|' && input[pos + 1] == '|')
+    else if (pos + 1 < input.length() && input[pos] == '|' && input[pos + 1] == '|')
     {
         tok = new Token(OPERATOR, "||");
         tok->attribute = OR;
         pos += 2;
-        
     }
-    else if(input[pos] == '(')
+    else if (input[pos] == '(')
     {
         tok = new Token(LPAREN, "(");
         pos++;
-        
     }
-    else if(input[pos] == ')')
+    else if (input[pos] == ')')
     {
         tok = new Token(RPAREN, ")");
         pos++;
-        
     }
-    else if(input[pos] == '{')
+    else if (input[pos] == '{')
     {
         tok = new Token(LBRACE, "{");
         pos++;
-        
     }
-    else if(input[pos] == '}')
+    else if (input[pos] == '}')
     {
         tok = new Token(RBRACE, "}");
         pos++;
-        
     }
-    else if(input[pos] == '[')
+    else if (input[pos] == '[')
     {
         tok = new Token(LBRACKET, "[");
         pos++;
-        
     }
-    else if(input[pos] == ']')
+    else if (input[pos] == ']')
     {
         tok = new Token(RBRACKET, "]");
         pos++;
-        
     }
-    else if(input[pos] == ',')
+    else if (input[pos] == ',')
     {
         tok = new Token(COMMA, ",");
         pos++;
-        
     }
-    else if(input[pos] == ';')
+    else if (input[pos] == ';')
     {
         tok = new Token(SEMICOLON, ";");
         pos++;
-        
     }
     else
     {
-        lexicalError("Caractere inválido: " + string(1, input[pos]));
+        // REPORTA O ERRO: Passa o caractere inválido para a mensagem
+        lexicalError("Erro lexico: Caractere invalido '" + string(1, input[pos]) + "'");
+        
+        // Tenta ler o próximo token válido para não quebrar o Parser
+        return nextToken();
     }
-
     return tok;
- 
 }
-
+/*
+Se acontecer um erro lexico, ele vai pular aque token e tentar ler o próximo token válido, ao invés de abortar a compilação.
+mas fazendo uma contagem da quantidade de erros encontrados, para mostrar no final da compilação junto com os erros sintáticos encontrados pelo Parser.
+*/
 void 
 Scanner::lexicalError(string msg)
 {
-    cout << "Linha "<< line << ": " << msg << endl;
+    cout << "Linha " << line << ": " << msg << endl;
+    contagen_erros++; // Incrementa o contador de erros
     
-    exit(EXIT_FAILURE);
+    // RECUPERAÇÃO: Avança a posição para ignorar o caractere problemático
+    pos++; 
+    //exit(EXIT_FAILURE);
 }

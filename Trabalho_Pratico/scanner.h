@@ -8,9 +8,10 @@ class Scanner
         int pos;//Posição atual
         int line;
         SymbolTable* st;
-    
+        
     public:
-    //Construtor
+        //Construtor
+        int contagen_erros = 0;
         Scanner(string, SymbolTable*);
 
         int getLine();

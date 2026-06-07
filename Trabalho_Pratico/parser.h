@@ -136,6 +136,8 @@ class Parser
 		Parser(string);
 		void run();
 		void initializeSymbolTable();
+		int errorCount = 0; // Contador de erros
+    	void synchronize(const std::vector<int>& syncTokens); // Função de pânico
 
 
         void error(string);
